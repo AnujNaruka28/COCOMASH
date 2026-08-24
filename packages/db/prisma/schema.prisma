@@ -1,0 +1,231 @@
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum RoomType {
+  normal
+  playground
+}
+
+enum RoomStatus {
+  waiting
+  active
+  ended
+  expired
+}
+
+enum ParticipantRole {
+  creator
+  joiner
+}
+
+enum ParticipantStatus {
+  active
+  left
+  kicked
+}
+
+enum SubmissionStatus {
+  pending
+  running
+  completed
+  failed
+}
+
+enum TestResultStatus {
+  pending
+  running
+  passed
+  failed
+  error
+  timeout
+}
+
+model User {
+  id                String    @id @default(uuid())
+  google_id         String?   @unique
+  email             String?   @unique @db.VarChar(255)
+  name              String    @db.VarChar(50)
+  profile_url       String?   
+  email_verified_at DateTime?
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+
+  created_rooms     Room[]           @relation("RoomCreator")
+  participants      RoomParticipant[]
+
+  @@map("users")
+}
+
+model Room {
+  id               String       @id @default(uuid())
+  creator_id       String
+  name             String?
+  room_type        RoomType     @default(normal)
+  status           RoomStatus   @default(waiting)
+  max_participants Int          
+  created_at       DateTime     @default(now())
+  started_at       DateTime?
+  ended_at         DateTime?
+  expires_at       DateTime
+
+  creator          User                 @relation("RoomCreator", fields: [creator_id], references: [id])
+  participants     RoomParticipant[]
+  exercises        Exercise[]
+  submissions      Submission[]
+  chat_messages    ChatMessage[]
+
+  @@map("rooms")
+}
+
+model RoomParticipant {
+  id            String             @id @default(uuid())
+  room_id       String
+  user_id       String
+  display_name  String
+  role          ParticipantRole
+  status        ParticipantStatus @default(active)
+  joined_at     DateTime           @default(now())
+  left_at       DateTime?
+
+  room          Room              @relation(fields: [room_id], references: [id])
+  user          User              @relation(fields: [user_id], references: [id])
+  group_members GroupMember[]
+  submissions   Submission[]
+  chat_messages ChatMessage[]
+  activity_logs ExerciseActivityLog[]
+
+  @@unique([room_id, user_id])
+  @@unique([room_id, display_name])
+  @@map("room_participants")
+}
+
+model Exercise {
+  id                  String     @id @default(uuid())
+  room_id             String
+  title               String
+  description         String?
+  allowed_languages   String[]
+  time_limit_seconds  Int?
+  created_at          DateTime   @default(now())
+  updated_at          DateTime   @updatedAt
+
+  room                Room                  @relation(fields: [room_id], references: [id])
+  groups              Group[]
+  test_cases          TestCase[]
+  submissions         Submission[]
+  activity_logs       ExerciseActivityLog[]
+
+  @@map("exercises")
+}
+
+model Group {
+  id         String   @id @default(uuid())
+  exercise_id String
+  name       String
+  created_at DateTime @default(now())
+
+  exercise   Exercise     @relation(fields: [exercise_id], references: [id])
+  members    GroupMember[]
+
+  @@unique([exercise_id, name])
+  @@map("groups")
+}
+
+model GroupMember {
+  id             String   @id @default(uuid())
+  group_id       String
+  participant_id  String
+  joined_at      DateTime @default(now())
+  left_at        DateTime?
+
+  group          Group           @relation(fields: [group_id], references: [id])
+  participant    RoomParticipant @relation(fields: [participant_id], references: [id])
+
+  @@map("group_members")
+}
+
+model TestCase {
+  id             String   @id @default(uuid())
+  exercise_id    String
+  input          String?
+  expected_output String?
+  is_hidden      Boolean  @default(false)
+  created_at     DateTime @default(now())
+
+  exercise       Exercise                 @relation(fields: [exercise_id], references: [id])
+  test_results   SubmissionTestResult[]
+
+  @@map("test_cases")
+}
+
+model Submission {
+  id             String           @id @default(uuid())
+  room_id        String
+  exercise_id    String
+  participant_id String
+  source_code    String           
+  language       String           @db.VarChar(30)
+  status         SubmissionStatus @default(pending)
+  score          Int?
+  created_at     DateTime         @default(now())
+  submitted_at   DateTime?
+
+  room           Room                 @relation(fields: [room_id], references: [id])
+  exercise       Exercise             @relation(fields: [exercise_id], references: [id])
+  participant    RoomParticipant      @relation(fields: [participant_id], references: [id])
+  test_results   SubmissionTestResult[]
+
+  @@map("submissions")
+}
+
+model SubmissionTestResult {
+  id              String           @id @default(uuid())
+  submission_id   String
+  test_case_id    String
+  status          TestResultStatus @default(pending)
+  actual_output   String?
+  error_type      String?
+  error_message   String?
+  execution_time_ms Int?
+  created_at      DateTime         @default(now())
+
+  submission      Submission @relation(fields: [submission_id], references: [id])
+  test_case       TestCase   @relation(fields: [test_case_id], references: [id])
+
+  @@unique([submission_id, test_case_id])
+  @@map("submission_test_results")
+}
+
+model ChatMessage {
+  id             String   @id @default(uuid())
+  room_id        String
+  participant_id String
+  message        String
+  created_at     DateTime @default(now())
+
+  room           Room            @relation(fields: [room_id], references: [id])
+  participant    RoomParticipant @relation(fields: [participant_id], references: [id])
+
+  @@map("chat_messages")
+}
+
+model ExerciseActivityLog {
+  id             String   @id @default(uuid())
+  participant_id String
+  exercise_id    String
+  event_type     String
+  metadata       Json?
+  created_at     DateTime @default(now())
+
+  participant    RoomParticipant @relation(fields: [participant_id], references: [id])
+  exercise       Exercise        @relation(fields: [exercise_id], references: [id])
+
+  @@map("exercise_activity_log")
+}
