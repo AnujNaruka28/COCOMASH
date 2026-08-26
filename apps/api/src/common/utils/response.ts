@@ -50,7 +50,18 @@ function errorResponse<T>(
     return res.status(statusCode).json(response);
 }
 
+const createdResponse = <T>(
+  res: Response,
+  data: T,
+  message: string = 'Resource created successfully'
+): Response => successResponse(res, message, data, 201);
+
+ 
+const noContentResponse = (res: Response): Response => res.status(204).send();
+
 export {
     successResponse,
-    errorResponse
+    errorResponse,
+    createdResponse,
+    noContentResponse
 }
