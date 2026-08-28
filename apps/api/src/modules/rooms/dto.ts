@@ -23,12 +23,19 @@ const getRoomByIdSchema = z.object({
   id: z.string(),
 });
 
+const paginationSchema = z.object({
+  page: z.string().optional().transform(val => parseInt(val || '1')),
+  limit: z.string().optional().transform(val => parseInt(val || '10')),
+});
+
 export type CreateRoomDto = z.infer<typeof createRoomSchema>;
 export type RoomResponse = z.infer<typeof roomResponseSchema>;
 export type GetRoomByIdDto = z.infer<typeof getRoomByIdSchema>;
+export type PaginationDto = z.infer<typeof paginationSchema>;
 
 export {
   createRoomSchema,
   roomResponseSchema,
-  getRoomByIdSchema
+  getRoomByIdSchema,
+  paginationSchema
 };

@@ -19,7 +19,7 @@ app.get('/health', (_req, res) => {
 });
 
 app.listen(PORT, async () => {
-    await connectDB();
-    await connectRedis();
-    console.log(`API server running on port ${PORT}`);
+  await connectDB();
+  await connectRedis();
+  console.log(`API server running on port ${PORT}`);
 });
