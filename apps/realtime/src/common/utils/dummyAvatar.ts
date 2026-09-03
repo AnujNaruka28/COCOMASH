@@ -1,0 +1,1 @@
+export const dummyAvatar = (name: string) => `https://api.dicebear.com/10.x/shadows/svg?seed=${name}`

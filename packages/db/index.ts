@@ -1,4 +1,4 @@
-export { prisma, connectDB, disconnectDB } from './src/client';
-export * from './src/generated/prisma/client';
+export { prisma, connectDB, disconnectDB } from './src/client.js';
+export * from './src/generated/prisma/client.js';
 
-export * from './repositories/index';
+export * from './repositories/index.js';

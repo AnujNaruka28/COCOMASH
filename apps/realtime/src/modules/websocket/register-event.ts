@@ -1,12 +1,11 @@
-import type { Server, Socket } from "socket.io";
-import { registerRoomEvents } from "../rooms/handler";
+import type { Socket } from "socket.io";
 import z from "zod";
 
-function registerEvent<T extends z.ZodType>(
+export function registerEvent<T extends z.ZodType>(
     socket: Socket,
     event: string,
     schema: T,
-    handler: (data: z.infer<T>) => Promise<void>
+    handler: (data: z.infer<T>) => Promise<void>,
 ) {
 
     socket.on(event, async (rawData) => {
@@ -30,13 +29,3 @@ function registerEvent<T extends z.ZodType>(
     
 }
 
-function registerEvents(io: Server, socket: Socket) {
-    
-    registerRoomEvents(io, socket);
-
-}
-
-export {
-    registerEvent,
-    registerEvents
-}

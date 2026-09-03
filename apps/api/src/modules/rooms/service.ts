@@ -1,16 +1,22 @@
 import { roomRepository } from "@repo/db";
 import { NotFoundError } from "../../common/utils/AppError.js";
+import { CreateRoomDto } from "./dto.js";
 
 class RoomService {
     
-    async createRoom(roomData: any, creatorId: string) {
+    async createRoom(roomData: CreateRoomDto, creatorId: string) {
 
-        const { displayName, ...coreRoomData } = roomData;
+        const { display_name, ...coreRoomData } = roomData;
+
+        const expiresAt = new Date(Date.now() + 45 * 60 * 1000);
 
         const { room, participant } = await roomRepository.createRoomWithCreator(
-            coreRoomData, 
+            {
+                ...coreRoomData,
+                expires_at: expiresAt
+            }, 
             creatorId, 
-            displayName
+            display_name
         );
 
         return { 

@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
 const createRoomSchema = z.object({
-  name: z.string().min(1).max(100).optional(),
-  room_type: z.enum(['normal', 'playground']).default('normal'),
-  max_participants: z.number().min(2).max(10).default(4),
+  name: z.string().min(0).max(100).optional().default(''),
+  room_type: z.enum(['normal', 'playground']),
+  max_participants: z.number().min(2).max(10),
   display_name: z.string().min(1).max(50),
 });
 
@@ -20,7 +20,7 @@ const roomResponseSchema = z.object({
 });
 
 const getRoomByIdSchema = z.object({
-  id: z.string(),
+  id: z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i, "Invalid UUID"),
 });
 
 const paginationSchema = z.object({

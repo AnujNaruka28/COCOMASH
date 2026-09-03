@@ -1,5 +1,5 @@
 import { ZodType } from "zod";
-import { asyncHandler } from "../utils/asyncHandler.js";
+import asyncHandler from "../utils/asyncHandler.js";
 import { NextFunction, Request, Response } from "express";
 import { ValidationError } from "../utils/AppError.js";
 
