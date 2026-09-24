@@ -10,7 +10,7 @@ class RoomService {
 
         const expiresAt = new Date(Date.now() + 45 * 60 * 1000);
 
-        const { room, participant } = await roomRepository.createRoomWithCreator(
+        const { room, participant, user } = await roomRepository.createRoomWithCreator(
             {
                 ...coreRoomData,
                 expires_at: expiresAt
@@ -22,7 +22,7 @@ class RoomService {
         return { 
             room, 
             participant,
-            websocket_url: `/ws/rooms/${room.id}`
+            user
         };
 
     }

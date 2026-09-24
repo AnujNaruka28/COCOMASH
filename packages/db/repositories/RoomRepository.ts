@@ -13,8 +13,10 @@ class RoomRepository {
         return prisma.$transaction(async (tx) => {
 
             let userId: string = creatorId;
+            let user: any = null;
+            
             if(!creatorId) {
-                const user = await tx.user.create({
+                user = await tx.user.create({
                     data: {
                         name: displayName
                     }
@@ -43,7 +45,7 @@ class RoomRepository {
                 }
             })
             
-            return { room, participant }
+            return { room, participant, user }
         },{
             maxWait: 8000,
             timeout: 10000
@@ -95,6 +97,13 @@ class RoomRepository {
     ) {
 
         return prisma.$transaction(async (tx) => {
+            
+            const user = await tx.user.findUnique({
+                where: { id: userId }
+            });
+            
+            if (!user) 
+                throw new Error("User not found");
             
             const rooms = await tx.$queryRaw<{
                 id: string,

@@ -11,7 +11,7 @@ async function handleRoomJoin(
 ) {
     const result = await roomService.joinRoom(
         data.roomId, 
-        socket.data.userId, 
+        data.userId, 
         data.displayName
     );
 

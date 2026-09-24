@@ -14,12 +14,13 @@ class RoomController {
         const creatorId = getUserId(req);
         
         const result = await roomService.createRoom(roomData, creatorId);
-        return createdResponse(
+        
+        createdResponse(
             res, 
             {
                 room: result.room,
                 participant: result.participant,
-                websocket_url: result.websocket_url
+                user: result.user
             }, 
             "Room created successfully"
         );
@@ -29,13 +30,13 @@ class RoomController {
     getAllRooms = asyncHandler(async (req: Request, res: Response) => {
         const { page = 1, limit = 10 } = req.query as unknown as PaginationDto; 
         const rooms = await roomService.getAllRooms(page, limit);
-        return successResponse(res, "Rooms fetched successfully", rooms);
+        successResponse(res, "Rooms fetched successfully", rooms);
     })
 
     getRoom = asyncHandler(async (req: Request, res: Response) => {
         const roomId = req.params.id as string;
         const room = await roomService.getRoomById(roomId);
-        return successResponse(res, "Room fetched successfully", room);
+        successResponse(res, "Room fetched successfully", room);
     })
 
 }

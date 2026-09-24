@@ -20,22 +20,17 @@ interface RoomDetails {
 }
 
 interface RoomStore {
-  // WebSocket connection
   websocketUrl: string | null;
   
-  // Room state
   isCreator: boolean;
   isStarted: boolean;
   isLoading: boolean;
   error: string | null;
   
-  // Room details
   roomDetails: RoomDetails | null;
   
-  // Participants
   participants: Participant[];
   
-  // Actions
   setWebSocketUrl: (url: string) => void;
   setCreator: (isCreator: boolean) => void;
   setStarted: (started: boolean) => void;
@@ -49,7 +44,7 @@ interface RoomStore {
 }
 
 export const useRoomStore = create<RoomStore>((set) => ({
-  // Initial state
+
   websocketUrl: null,
   isCreator: false,
   isStarted: false,
@@ -58,7 +53,6 @@ export const useRoomStore = create<RoomStore>((set) => ({
   roomDetails: null,
   participants: [],
   
-  // Actions
   setWebSocketUrl: (websocketUrl) => set({ websocketUrl }),
   setCreator: (isCreator) => set({ isCreator }),
   setStarted: (isStarted) => set({ isStarted }),
@@ -67,9 +61,13 @@ export const useRoomStore = create<RoomStore>((set) => ({
   setRoomDetails: (roomDetails) => set({ roomDetails }),
   setParticipants: (participants) => set({ participants }),
   
-  addParticipant: (participant) => set((state) => ({
-    participants: [...state.participants, participant]
-  })),
+  addParticipant: (participant) => set((state) => {
+    const exists = state.participants.some(p => p.id === participant.id);
+    if (exists) return state;
+    return {
+      participants: [...state.participants, participant]
+    };
+  }),
   
   removeParticipant: (participantId) => set((state) => ({
     participants: state.participants.filter(p => p.id !== participantId)

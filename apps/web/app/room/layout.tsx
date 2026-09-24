@@ -5,8 +5,8 @@ export default function RoomLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="w-screen h-dvh bg-background">
+    <section className="w-screen h-dvh bg-background">
       {children}
-    </div>
+    </section>
   );
 }

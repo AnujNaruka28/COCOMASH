@@ -14,7 +14,8 @@
       "@/components/*": ["./components/*"],
       "@/lib/*": ["./lib/*"],
       "@/types/*": ["./types/*"],
-      "@/store/*": ["./store/*"]
+      "@/store/*": ["./store/*"],
+      "@/hooks/*": ["./hooks/*"]
     }
   },
   "include": [

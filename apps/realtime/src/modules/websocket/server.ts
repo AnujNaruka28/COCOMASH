@@ -1,4 +1,4 @@
-import { Server } from 'socket.io';
+import { Server, ServerOptions } from 'socket.io';
 import { ENV } from '../../config/env';
 import { registerEvents } from './register-events';
 
@@ -8,7 +8,7 @@ function createSocketServer() {
         cors: {
             origin: ENV.WEB_URL,
         },
-    });
+    } as ServerOptions);
 
     io.on("connection", (socket) => {
         registerEvents(io, socket);

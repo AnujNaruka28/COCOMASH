@@ -4,7 +4,7 @@ dotenv.config();
 
 const envSchema = z.object({
     NODE_ENV: z.enum(["development", "production", "test"]),
-    PORT: z.number().default(3000),
+    PORT: z.string().default("3000").transform(Number),
     WEB_URL: z.url(),
 });
 

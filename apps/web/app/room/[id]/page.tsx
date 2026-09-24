@@ -1,4 +1,6 @@
 
+import Room from "@/features/rooms/components/Room";
+
 interface RoomPageProps {
   params: Promise<{
     id: string;
@@ -7,6 +9,6 @@ interface RoomPageProps {
 
 export default async function RoomPage({ params }: RoomPageProps) {
   const { id } = await params;
-  console.log(id);
-  return <></>;
+
+  return <Room roomId={id} />;
 }
