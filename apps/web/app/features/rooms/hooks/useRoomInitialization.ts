@@ -4,7 +4,7 @@ import { useGetRoom } from '../services/roomService';
 
 export const useRoomInitialization = (roomId: string) => {
   const { websocketUrl, setWebSocketUrl, isLoading } = useRoomStore();
-  const { data: roomData, isLoading: isRoomLoading } = useGetRoom(roomId);
+  const { data: roomData, isLoading: isRoomLoading, refetch: refetchRoom } = useGetRoom(roomId);
 
   useEffect(() => {
     if (!websocketUrl && roomId) {
@@ -18,5 +18,6 @@ export const useRoomInitialization = (roomId: string) => {
     roomData,
     roomId,
     isLoading: isRoomLoading || isLoading,
+    refetchRoom
   };
 };

@@ -6,18 +6,18 @@ import { useRoomInitialization } from "../hooks/useRoomInitialization"
 import { useRoomWebSocket } from "../hooks/useRoomWebSocket"
 import RoomModal from "./RoomModal";
 import { RoomJoinModal } from "./RoomJoinModal";
-import Editor from "@/features/editor/components/Editor";
-import { useRoomStore } from "@/store/roomStore";
 import { useUserStore } from "@/store/userStore";
+import dynamic from "next/dynamic";
 
-interface RoomProps {
+const EditorComponent = dynamic(() => import("@/features/editor/components/EditorRoom"), {
+    ssr: false
+});
+
+const Room = ( { roomId }: {
     roomId: string;
-}
+} ) => {
 
-const Room = ( { roomId }: RoomProps ) => {
-
-    const { websocketUrl, isLoading } = useRoomInitialization(roomId);
-    const { isStarted } = useRoomStore();
+    const { roomData, websocketUrl, isLoading, refetchRoom } = useRoomInitialization(roomId);
     const { setUser } = useUserStore();
     const [showJoinModal, setShowJoinModal] = useState(false);
     const [isUserReady, setIsUserReady] = useState(false);
@@ -50,19 +50,46 @@ const Room = ( { roomId }: RoomProps ) => {
     
     const { userId } = useUserStore();
     
-    useRoomWebSocket(websocketUrl, roomId, shouldConnectWebSocket ? userId : null);
+    const { socket } = useRoomWebSocket(websocketUrl, roomId, shouldConnectWebSocket ? userId : null, refetchRoom);
 
     if(isLoading) return <Loading /> ;
 
-    if(isStarted) return <Editor /> ;
+    const isCreator = !!userId && userId === roomData?.data?.data?.creator_id;
+
+    if (roomData?.data?.data?.status === 'active') {
+        return (
+        <>
+
+            {
+                socket && (
+                    <EditorComponent
+                        socket={socket}
+                        roomId={roomId}
+                        roomName={roomData?.data?.data?.name || ""}
+                        isCreator={isCreator}
+                    />
+                )
+            }
+            <RoomJoinModal
+                isOpen={showJoinModal}
+                onJoinSuccess={handleJoinSuccess}
+            />
+
+        </>
+        );
+    }
 
     return (
         <>
+            <RoomModal 
+                status={roomData?.data?.data?.status || "waiting"} 
+                roomId={roomId} 
+                isCreator={isCreator} 
+            />
             <RoomJoinModal 
                 isOpen={showJoinModal} 
                 onJoinSuccess={handleJoinSuccess}
             />
-            {!showJoinModal && <RoomModal websocketUrl={websocketUrl || ""} roomId={roomId} />}
         </>
     );
 }

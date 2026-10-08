@@ -12,7 +12,7 @@ export function registerRoomEvents(
             socket,
             event,
             schema,
-            (data) => handler(io, socket, data)
+            (data: any) => handler(io, socket, data)
         );
     });
 }

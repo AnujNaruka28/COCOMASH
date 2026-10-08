@@ -7,7 +7,9 @@ const nextConfig = {
                 hostname: 'api.dicebear.com',
             }
         ]
-    }
+    },
+    transpilePackages: ['y-codemirror.next', 'yjs']
 };
 
 export default nextConfig;
+

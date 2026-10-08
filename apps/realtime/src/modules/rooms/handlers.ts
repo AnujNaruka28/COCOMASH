@@ -1,7 +1,7 @@
 
 import type { Server, Socket } from "socket.io";
 import { roomService } from "./service";
-import { RoomJoinDTO } from "./dto";
+import { RoomJoinDTO, RoomLanguageChangeDTO, RoomStartDTO } from "./dto";
 import { dummyAvatar } from "../../common/utils/dummyAvatar";
 
 async function handleRoomJoin(
@@ -9,6 +9,7 @@ async function handleRoomJoin(
     socket: Socket,
     data: RoomJoinDTO,
 ) {
+    
     const result = await roomService.joinRoom(
         data.roomId, 
         data.userId, 
@@ -45,6 +46,57 @@ async function handleRoomJoin(
 
 }
 
+async function handleRoomStart(
+    io: Server,
+    socket: Socket,
+    data: RoomStartDTO,
+) {
+    
+    const result = await roomService.startRoom(
+        data.roomId
+    );
+
+    if (!result) {
+        socket.emit("room:start:error", { 
+            code: "START_FAILED",
+            message: "Failed to start room"
+        });
+        return;
+    }
+
+    io.to(data.roomId).emit("room:started");
+}
+
+async function handleRoomLanguageChange(
+  io: Server,
+  socket: Socket,
+  data: RoomLanguageChangeDTO,
+) {
+  const room = await roomService.getRoom(data.roomId);
+
+  if (!room) {
+    socket.emit("room:language:change:error", {
+      code: "ROOM_NOT_FOUND",
+      message: "Room not found",
+    });
+    return;
+  }
+
+  if (room.creator_id !== data.userId) {
+    socket.emit("room:language:change:error", {
+      code: "NOT_AUTHORIZED",
+      message: "Only the room creator can change the language",
+    });
+    return;
+  }
+
+  io.to(data.roomId).emit("room:language:changed", {
+    language: data.language,
+  });
+}
+
 export {
-    handleRoomJoin
+    handleRoomJoin,
+    handleRoomStart,
+    handleRoomLanguageChange
 }

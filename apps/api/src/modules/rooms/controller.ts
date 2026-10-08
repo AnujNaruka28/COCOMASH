@@ -1,6 +1,6 @@
 import asyncHandler from "../../common/utils/asyncHandler.js"
 import {Request,Response} from "express"
-import { createdResponse, successResponse } from "../../common/utils/response.js";
+import { createdResponse, successResponse, errorResponse } from "../../common/utils/response.js";
 import { CreateRoomDto, PaginationDto, RoomResponse } from "./dto.js";
 import roomService from "./service.js";
 import getUserId from "../../common/utils/auth.js";

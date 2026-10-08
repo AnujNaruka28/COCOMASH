@@ -221,6 +221,42 @@ class RoomRepository {
         });
 
     }
+
+    async startRoom(
+        roomId: string
+    ) {
+
+        const room = await prisma.room.findUnique({
+            where: {
+                id: roomId
+            }
+        });
+
+        if(!room) throw new Error("Room Not Found");
+
+        const updatedRoom = await prisma.room.update({
+            where: {
+                id: roomId
+            },
+            data: {
+                status: "active"
+            }
+        });
+
+        return updatedRoom;
+    }
+
+    async getRoom(
+        roomId: string
+    ) {
+        const room = await prisma.room.findUnique({
+            where: {
+                id: roomId
+            }
+        });
+
+        return room;
+    }
 };
 
 const roomRepository = new RoomRepository();

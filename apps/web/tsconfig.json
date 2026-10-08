@@ -10,12 +10,26 @@
     "ignoreDeprecations": "6.0",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*", "./app/*", "./types/*"],
-      "@/components/*": ["./components/*"],
-      "@/lib/*": ["./lib/*"],
-      "@/types/*": ["./types/*"],
-      "@/store/*": ["./store/*"],
-      "@/hooks/*": ["./hooks/*"]
+      "@/*": [
+        "./src/*",
+        "./app/*",
+        "./types/*"
+      ],
+      "@/components/*": [
+        "./components/*"
+      ],
+      "@/lib/*": [
+        "./lib/*"
+      ],
+      "@/types/*": [
+        "./types/*"
+      ],
+      "@/store/*": [
+        "./store/*"
+      ],
+      "@/hooks/*": [
+        "./hooks/*"
+      ]
     }
   },
   "include": [
@@ -25,5 +39,7 @@
     "next.config.js",
     ".next/types/**/*.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }

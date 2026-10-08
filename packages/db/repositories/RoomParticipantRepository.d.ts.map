@@ -1,0 +1,1 @@
+{"version":3,"file":"RoomParticipantRepository.d.ts","sourceRoot":"","sources":["RoomParticipantRepository.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,MAAM,EAAE,MAAM,mCAAmC,CAAC;AAE3D,cAAM,yBAAyB;IAErB,iBAAiB,CACnB,IAAI,EAAE,MAAM,CAAC,0BAA0B;;;;;;;;;;IAOrC,gCAAgC,CAClC,MAAM,EAAE,MAAM,EACd,MAAM,EAAE,MAAM;;;;;;;;;;CASrB;AAED,QAAA,MAAM,yBAAyB,2BAAkC,CAAC;AAElE,eAAe,yBAAyB,CAAC"}

@@ -8,7 +8,7 @@ import { useUserStore } from "@/store/userStore";
 
 const useCreateRoom = () => {
     const router = useRouter();
-    const { setLoading, setWebSocketUrl, setCreator, setRoomDetails } = useRoomStore();
+    const { setLoading, setWebSocketUrl, setRoomDetails } = useRoomStore();
     const { setUser } = useUserStore();
     
     return useMutation({
@@ -19,11 +19,8 @@ const useCreateRoom = () => {
 
             const wsBaseUrl = process.env.NEXT_PUBLIC_WEBSOCKET_URL!;
             setWebSocketUrl(wsBaseUrl);
-            setCreator(true);
             setRoomDetails(response.data.data?.room);
-            console.log(response.data.data);
             
-            // Store user data if returned
             if (response.data.data?.user) {
                 const userData = response.data.data.user;
                 setUser({

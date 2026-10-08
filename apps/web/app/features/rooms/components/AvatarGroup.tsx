@@ -14,7 +14,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export function AvatarGroup() {
 
-  const {participants} = useRoomStore();
+  const { participants } = useRoomStore();
+  
   return (
     <div className="group/avatars flex items-center px-2 py-4">
       {Array.isArray(participants) && participants.length > 0 ? participants.map((participant,idx) => (

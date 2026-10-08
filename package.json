@@ -18,5 +18,10 @@
   "packageManager": "pnpm@12.4.1",
   "engines": {
     "node": ">=18"
+  },
+  "pnpm": {
+    "overrides": {
+      "monaco-editor": "0.56.0"
+    }
   }
 }

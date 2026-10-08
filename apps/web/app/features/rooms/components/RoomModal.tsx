@@ -10,13 +10,14 @@ import { Input } from "@/components/ui/input";
 import { CopyButton } from "@/components/common/CopyButton";
 
 interface RoomModalProps {
-  websocketUrl: string;
   roomId: string;
+  status: "waiting" | "active" | "ended" | "expired";
+  isCreator: boolean;
 }
 
-const RoomModal = ({ roomId }: RoomModalProps) => {
+const RoomModal = ({ roomId, status, isCreator }: RoomModalProps) => {
   
-  const { isStarted, isCreator, participants } = useRoomStore();
+  const { participants } = useRoomStore();
 
   const handleStart = () => {
     webSocketService.emit('room:start', { roomId: roomId });
@@ -28,7 +29,7 @@ const RoomModal = ({ roomId }: RoomModalProps) => {
   };
 
   return (
-    <Dialog open={!isStarted}>
+    <Dialog open={status === "waiting"}>
       <DialogContent className="p-0 border-0 bg-transparent">
         <MovingBorderButton
           borderRadius="1rem"
@@ -52,11 +53,11 @@ const RoomModal = ({ roomId }: RoomModalProps) => {
               <div className="w-full flex">
                 <Input
                 id="invite-link" 
-                placeholder={"https://localhost:3000/room/" + roomId}
+                placeholder={`http://localhost:3000/room/${roomId}`}
                 className="text-white placeholder:text-gray-400 bg-background/50 border-gray-600 focus:border-white"
                 readOnly
                 />
-                <CopyButton value={"https://localhost:3000/room/" + roomId} />
+                <CopyButton value={`http://localhost:3000/room/${roomId}`} />
               </div>
 
               <FieldDescription className="text-gray-400">Share this link with your participants</FieldDescription>

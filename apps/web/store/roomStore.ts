@@ -20,10 +20,9 @@ interface RoomDetails {
 }
 
 interface RoomStore {
+  
   websocketUrl: string | null;
   
-  isCreator: boolean;
-  isStarted: boolean;
   isLoading: boolean;
   error: string | null;
   
@@ -32,8 +31,6 @@ interface RoomStore {
   participants: Participant[];
   
   setWebSocketUrl: (url: string) => void;
-  setCreator: (isCreator: boolean) => void;
-  setStarted: (started: boolean) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   setRoomDetails: (details: RoomDetails) => void;
@@ -54,8 +51,6 @@ export const useRoomStore = create<RoomStore>((set) => ({
   participants: [],
   
   setWebSocketUrl: (websocketUrl) => set({ websocketUrl }),
-  setCreator: (isCreator) => set({ isCreator }),
-  setStarted: (isStarted) => set({ isStarted }),
   setLoading: (isLoading) => set({ isLoading }),
   setError: (error) => set({ error }),
   setRoomDetails: (roomDetails) => set({ roomDetails }),
@@ -75,8 +70,6 @@ export const useRoomStore = create<RoomStore>((set) => ({
   
   reset: () => set({
     websocketUrl: null,
-    isCreator: false,
-    isStarted: false,
     isLoading: false,
     error: null,
     roomDetails: null,
