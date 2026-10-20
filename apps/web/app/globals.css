@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+.xterm .xterm-scrollable-element {
+  background-color: #000 !important;
+}
+
 @theme {
   --color-background: oklch(1 0 0);
   --color-foreground: oklch(0.145 0 0);

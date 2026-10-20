@@ -1,6 +1,5 @@
 import { IoMicOffCircleOutline, IoMicCircleOutline } from "react-icons/io5";
 import { TbCamera, TbCameraOff } from "react-icons/tb";
-import { HiOutlineTerminal } from "react-icons/hi";
 import { TfiWrite } from "react-icons/tfi";
 import { RiChat1Line, RiIndeterminateCircleLine } from "react-icons/ri";
 
@@ -17,21 +16,16 @@ export const baseMenuItems = [
   },
   { 
     id: 3, 
-    label: 'Terminal', 
-    icon: HiOutlineTerminal,
-  },
-  { 
-    id: 4, 
     label: 'Whiteboard', 
     icon: TfiWrite,
   },
   { 
-    id: 5, 
+    id: 4, 
     label: 'End Call', 
     icon: RiIndeterminateCircleLine,
   },
   { 
-    id: 6, 
+    id: 5, 
     label: 'Camera', 
     icon: TbCamera,
   }

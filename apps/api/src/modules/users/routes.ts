@@ -6,4 +6,4 @@ const router: Router = Router();
 router.post("/", userController.createOrGetUser);
 router.get("/:id", userController.getUserById);
 
-export default router;
+export { router as usersRoutes };

@@ -21,6 +21,7 @@ interface UseRoomMenuHookReturn {
   whiteboardOpen: boolean;
   terminalOpen: boolean;
   chatOpen: boolean;
+  setTerminalOpen: (open: boolean) => void;
   handleTerminal: () => void;
   handleWhiteboard: () => void;
   handleChat: () => void;
@@ -69,12 +70,10 @@ export function useRoomMenu(): UseRoomMenuHookReturn {
             handler: handleMicToggle 
           };
         case 3:
-          return { ...item, handler: handleTerminal };
-        case 4:
           return { ...item, handler: handleWhiteboard };
-        case 5:
+        case 4:
           return { ...item, handler: handleEndCall };
-        case 6:
+        case 5:
           return { 
             ...item, 
             icon: cameraState === 'on' ? TbCamera : TbCameraOff, 
@@ -101,6 +100,7 @@ export function useRoomMenu(): UseRoomMenuHookReturn {
     whiteboardOpen,
     terminalOpen,
     chatOpen,
+    setTerminalOpen,
     handleTerminal,
     handleWhiteboard,
     handleChat,

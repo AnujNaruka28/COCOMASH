@@ -4,7 +4,7 @@ import CTAButton from "@/components/common/CTAButton";
 import webSocketService from "@/lib/WebSocketService";
 import Image from "next/image";
 import { Button as MovingBorderButton } from "@/components/ui/moving-border";
-import { AvatarGroup } from "./AvatarGroup";
+import { AvatarGroup } from "../../../../components/common/AvatarGroup";
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { CopyButton } from "@/components/common/CopyButton";
@@ -64,7 +64,7 @@ const RoomModal = ({ roomId, status, isCreator }: RoomModalProps) => {
             
             </Field>
 
-            <AvatarGroup />
+            <AvatarGroup {...{ participants }} />
 
             <DialogFooter>
               <CTAButton 

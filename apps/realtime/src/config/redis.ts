@@ -1,21 +1,4 @@
+import { getRedisClient, connectRedis } from '@repo/config';
 
-
-import { createClient } from "redis";
-import { ENV } from "./env";
-
-const redisClient = createClient({
-    url: ENV.REDIS_URL,
-});
-
-const connectRedis = async () => {
-
-    await redisClient.connect().then(() => {
-        console.log("Redis connected");
-    }).catch((err) => {
-        console.error("Redis connection failed", err);
-        process.exit(1);
-    });
-    
-}
-
-export { connectRedis, redisClient };
+export const redis = getRedisClient();
+export const initializeRedis = async () => await connectRedis();

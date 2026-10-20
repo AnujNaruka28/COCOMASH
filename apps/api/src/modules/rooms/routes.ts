@@ -9,4 +9,4 @@ router.post('/rooms', validateBody(createRoomSchema), roomController.createRoom)
 router.get('/rooms', validateQuery(paginationSchema), roomController.getAllRooms);  
 router.get('/rooms/:id', validateParams(getRoomByIdSchema), roomController.getRoom);
 
-export { router as roomsRouter };
+export { router as roomsRoutes };

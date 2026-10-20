@@ -3,9 +3,10 @@ import type { Server, Socket } from "socket.io";
 import { roomService } from "./service";
 import { RoomJoinDTO, RoomLanguageChangeDTO, RoomStartDTO } from "./dto";
 import { dummyAvatar } from "../../common/utils/dummyAvatar";
+import { subscribeToRoomExecution, unsubscribeFromRoomExecution } from "../execution/subscriber";
 
 async function handleRoomJoin(
-    _io: Server,
+    io: Server,
     socket: Socket,
     data: RoomJoinDTO,
 ) {
@@ -30,12 +31,14 @@ async function handleRoomJoin(
         id: p.id,
         displayName: p.display_name,
         profileImage: p.user?.profile_url || dummyAvatar(p.display_name),
+        role: p.role
     }));
 
     const newParticipant = {
         id: result.participant.id,
         displayName: result.participant.display_name,
-        profileImage: result.participant.user?.profile_url || dummyAvatar(result.participant.display_name)
+        profileImage: result.participant.user?.profile_url || dummyAvatar(result.participant.display_name),
+        role: result.participant.role
     }
 
     socket.emit("room:state", {
@@ -44,6 +47,11 @@ async function handleRoomJoin(
     
     socket.to(data.roomId).emit("room:user_joined", newParticipant);
 
+    subscribeToRoomExecution(io, data.roomId);
+
+    socket.on('disconnect', () => {
+        unsubscribeFromRoomExecution(data.roomId);
+    });
 }
 
 async function handleRoomStart(

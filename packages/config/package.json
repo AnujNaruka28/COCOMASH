@@ -1,0 +1,19 @@
+{
+  "name": "@repo/config",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "bullmq": "^5.0.0",
+    "redis": "^6.3.0",
+    "zod": "^4.6.4",
+    "dotenv": "^17.4.2"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "typescript": "^7.0.2"
+  }
+}

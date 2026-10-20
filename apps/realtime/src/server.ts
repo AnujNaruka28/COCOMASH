@@ -1,12 +1,12 @@
 import createSocketServer from "./modules/websocket/server";
 import { ENV } from "./config/env";
-import { connectRedis } from "./config/redis";
+import { initializeRedis } from "./config/redis";
 
 async function startServer() {
 
     try {
 
-        await connectRedis();
+        await initializeRedis();
 
         const io = createSocketServer();
         io.listen(ENV.PORT as number);

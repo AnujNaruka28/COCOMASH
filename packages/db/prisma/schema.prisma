@@ -168,18 +168,22 @@ model TestCase {
 model Submission {
   id             String           @id @default(uuid())
   room_id        String
-  exercise_id    String
+  exercise_id    String?
   participant_id String
   source_code    String           
   language       String           @db.VarChar(30)
   status         SubmissionStatus @default(pending)
   score          Int?
+  output         String?
+  error          String?
+  exit_code      String?
+  execution_time_ms Int?
   created_at     DateTime         @default(now())
   submitted_at   DateTime?
 
-  room           Room                 @relation(fields: [room_id], references: [id])
-  exercise       Exercise             @relation(fields: [exercise_id], references: [id])
-  participant    RoomParticipant      @relation(fields: [participant_id], references: [id])
+  room           Room                  @relation(fields: [room_id], references: [id])
+  exercise       Exercise?             @relation(fields: [exercise_id], references: [id])
+  participant    RoomParticipant       @relation(fields: [participant_id], references: [id])
   test_results   SubmissionTestResult[]
 
   @@map("submissions")

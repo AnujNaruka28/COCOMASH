@@ -19,8 +19,10 @@ const LanguageDropDown = ({
   onChange,
   isDisabled,
 }: LanguageDropDownProps) => {
+
   return (
     <Select
+      defaultValue={"javascript"}
       value={value}
       onValueChange={onChange}
       disabled={isDisabled}

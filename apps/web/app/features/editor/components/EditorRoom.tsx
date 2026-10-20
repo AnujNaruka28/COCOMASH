@@ -1,12 +1,12 @@
 "use client";
 
-import { AvatarGroup } from "@/features/rooms/components/AvatarGroup";
-import GearButton from "@/components/common/GearButton";
+import { AvatarGroup } from "@/components/common/AvatarGroup";
 import { RadialMenu } from "@/components/ui/radial-menu";
 import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { useRoomMenu } from "../hooks/useRoomMenu";
 import ModalComponents from "../components/ModalComponents";
+import TerminalWindow from "../components/TerminalWindow";
 import dynamic from "next/dynamic";
 import type { Socket } from "socket.io-client";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,11 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/componen
 import LanguageDropDown from "./LanguageDropDown";
 import webSocketService from "@/lib/WebSocketService";
 import { useUserStore } from "@/store/userStore";
+import { useRoomStore } from "@/store/roomStore";
+import ParticipantsList from "./ParticipantsList";
+import { useExecuteCode } from "../services/executionService";
+import type { CodeMirrorRef } from "./CollaborativeCodeMirror";
+import { toast } from "sonner";
 
 const CollaborativeCodeMirror = dynamic(
   () => import("./CollaborativeCodeMirror"),
@@ -32,8 +37,10 @@ interface EditorRoomProps {
 const EditorRoom = ({ socket, roomId, roomName, isCreator }: EditorRoomProps) => {
 
   const editorRef = useRef<HTMLDivElement>(null);
-  const [selectedLanguage, setSelectedLanguage] = useState("javaScript");
+  const codeMirrorRef = useRef<CodeMirrorRef>(null);
+  const [selectedLanguage, setSelectedLanguage] = useState("javascript");
   const { userId } = useUserStore();
+  const { participants } = useRoomStore();
 
   const {
     menuItems,
@@ -41,9 +48,17 @@ const EditorRoom = ({ socket, roomId, roomName, isCreator }: EditorRoomProps) =>
     whiteboardOpen,
     terminalOpen,
     chatOpen,
+    setTerminalOpen,
     handleTerminal,
     handleChat,
   } = useRoomMenu();
+
+  // Execution state
+  const [executionStatus, setExecutionStatus] = useState<'pending' | 'running' | 'completed' | 'failed'>('pending');
+  const [terminalOutput, setTerminalOutput] = useState('');
+  const [terminalError, setTerminalError] = useState('');
+
+  const { mutate: executeCode, isPending: isExecuting } = useExecuteCode();
   
   useEffect(() => {
     
@@ -56,12 +71,79 @@ const EditorRoom = ({ socket, roomId, roomName, isCreator }: EditorRoomProps) =>
 
   }, [socket])
 
+  useEffect(() => {
+    
+    const handleExecutionResult = (result : {
+      status: "pending" | "running" | "completed" | "failed";
+      output?: string;
+      error?: string;
+    }) => { 
+
+      console.log('Execution result:', result);
+
+      switch (result.status) {
+
+        case "running":
+          setExecutionStatus("running");
+          setTerminalOutput('Running...\n');
+          setTerminalError("");
+          break;
+
+        case "completed":
+          setExecutionStatus("completed");
+          setTerminalOutput(result.output ?? "");
+          setTerminalError("");
+          break;
+        
+        case "failed":
+          setExecutionStatus("failed");
+          setTerminalOutput("");
+          setTerminalError(result.error ?? 'Execution failed');
+          break;
+        
+        default:
+
+          break;
+
+      }
+
+    };
+
+    socket.on('execution:result', handleExecutionResult);
+
+    return () => {
+      socket.off('execution:result', handleExecutionResult);
+    };
+  }, [socket]);
+
 
   const handleLanguageChange = (language: string) => {
     webSocketService.emit("room:language:change", {
       roomId,
       userId,
       language,
+    });
+  }
+
+  const handleRunCode = () => {
+    const sourceCode = codeMirrorRef.current?.getCode() || '';
+    
+    if (!sourceCode.trim()) {
+      toast.error('Please write some code first');
+      return;
+    }
+
+    setTerminalOpen(true);
+    setTerminalOutput('');
+    setTerminalError('');
+    setExecutionStatus('pending');
+
+    executeCode({
+      roomId,
+      userId: userId || '',
+      sourceCode,
+      language: selectedLanguage,
+      type: 'run',
     });
   }
 
@@ -78,15 +160,20 @@ const EditorRoom = ({ socket, roomId, roomName, isCreator }: EditorRoomProps) =>
           </h1>
         </header>
         <div className="flex-1 flex gap-2 items-center justify-around">
-          <AvatarGroup />
-          <GearButton size={32} />
+          <AvatarGroup participants={participants} />
+          <ParticipantsList participants={participants} />
         </div>
       </nav>
 
       <div className="h-10 bg-[#252526] border-b border-[#333] flex items-center justify-between px-4">
         <div className="flex items-center gap-3">
-          <Button className="bg-green-600 hover:bg-green-700 text-white px-4 py-1 h-8 text-sm flex items-center gap-2">
+          <Button 
+            onClick={handleRunCode}
+            disabled={isExecuting}
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 h-6 text-sm flex items-center gap-2 rounded-none"
+          >
             <Play className="w-4 h-4" />
+            <div className="w-px h-4 bg-white" />
             Run
           </Button>
           
@@ -106,7 +193,12 @@ const EditorRoom = ({ socket, roomId, roomName, isCreator }: EditorRoomProps) =>
         <ResizablePanel defaultSize="90%">
           <div className="relative w-full h-full" ref={editorRef}>
             {roomId && socket && (
-              <CollaborativeCodeMirror roomId={roomId} socket={socket} />
+              <CollaborativeCodeMirror 
+                ref={codeMirrorRef}
+                roomId={roomId} 
+                socket={socket} 
+                language={selectedLanguage} 
+              />
             )}
 
             <motion.div
@@ -131,24 +223,31 @@ const EditorRoom = ({ socket, roomId, roomName, isCreator }: EditorRoomProps) =>
         </ResizablePanel>
 
         {terminalOpen && (
-          <ResizableHandle className="bg-[#333] hover:bg-[#444] transition-colors mx-auto" withHandle />
-        )}
-
-        <ResizablePanel 
-          defaultSize={terminalOpen ? "10%" : "0%"} 
-          className={`${terminalOpen ? "w-full" : ""}`}
-        >
-          {terminalOpen && (
-            <ModalComponents
-              whiteboardOpen={whiteboardOpen}
-              terminalOpen={terminalOpen}
-              chatOpen={chatOpen}
-              setTerminalOpen={handleTerminal}
-              setChatOpen={handleChat}
+          <>
+            <ResizableHandle
+            className="bg-[#333] hover:bg-[#444] mx-auto"
+            withHandle
             />
-          )}
-        </ResizablePanel>
+            
+            <ResizablePanel defaultSize={25} minSize={10}>
+              <TerminalWindow
+                isOpen={terminalOpen}
+                onClose={handleTerminal}
+                status={executionStatus}
+                output={terminalOutput}
+                error={terminalError}
+              />
+            </ResizablePanel>
+          </>
+        )}
       </ResizablePanelGroup>
+
+      <ModalComponents
+        whiteboardOpen={whiteboardOpen}
+        chatOpen={chatOpen}
+        setChatOpen={handleChat}
+      />
+
     </main>
   );
 };
